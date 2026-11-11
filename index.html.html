@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bug Dash</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f2a3a;--panel:#163a4f;--ink:#e8f6fb;--coffee:#f2c14e;--bug:#ef5b3b;--accent:#7bdff2;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f2a3a}}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;touch-action:none}
+h1{margin:0;font-size:2rem;font-weight:800;letter-spacing:-.02em}
+.bar{display:flex;gap:20px;font-weight:500}
+.bar b{color:var(--coffee)}
+#wrap{position:relative;width:min(92vw,360px)}
+canvas{width:100%;height:auto;display:block;background:var(--panel);border-radius:14px;border:2px solid var(--accent)}
+#msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;background:rgba(15,42,58,.88);border-radius:14px;padding:20px}
+button{font:inherit;font-weight:800;background:var(--coffee);color:#0f2a3a;border:0;border-radius:10px;padding:12px 26px;font-size:1.05rem;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+p{margin:0;max-width:26ch;line-height:1.4}
+</style>
+</head>
+<body>
+<h1>Bug Dash</h1>
+<div class="bar"><span>Score <b id="s">0</b></span><span>Best <b id="b">0</b></span><span>Lives <b id="l">3</b></span></div>
+<div id="wrap">
+<canvas id="c" width="360" height="520"></canvas>
+<div id="msg"><h2 style="margin:0">Ship it without bugs</h2><p>Catch coffee ☕ to score. Dodge bugs 🐞. Three bugs and the build fails.</p><p style="opacity:.7">Arrow keys, or drag on the screen.</p><button id="go">Start coding</button></div>
+</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=360,H=520;
+const $=id=>document.getElementById(id);
+let best=0;try{best=+localStorage.getItem('bugdash')||0}catch(e){}
+$('b').textContent=best;
+let px,items,score,lives,t,spawn,running=false,keys={};
+function reset(){px=W/2;items=[];score=0;lives=3;t=0;spawn=0;$('s').textContent=0;$('l').textContent=3}
+function start(){reset();running=true;$('msg').style.display='none';loop()}
+function end(){running=false;if(score>best){best=score;try{localStorage.setItem('bugdash',best)}catch(e){}}
+$('b').textContent=best;$('msg').style.display='flex';
+$('msg').innerHTML='<h2 style="margin:0">Build failed</h2><p>You shipped '+score+' coffees worth of code.</p><button id="go">Try again</button>';
+$('go').onclick=start}
+$('go').onclick=start;
+addEventListener('keydown',e=>{keys[e.key]=1});addEventListener('keyup',e=>{keys[e.key]=0});
+function drag(e){const r=cv.getBoundingClientRect(),p=e.touches?e.touches[0]:e;px=(p.clientX-r.left)/r.width*W}
+cv.addEventListener('pointermove',e=>{if(running)drag(e)});
+cv.addEventListener('touchmove',e=>{if(running)drag(e)},{passive:true});
+function loop(){
+ if(!running)return;
+ t++;const lvl=1+score/10;
+ if(keys.ArrowLeft||keys.a)px-=6;if(keys.ArrowRight||keys.d)px+=6;
+ px=Math.max(20,Math.min(W-20,px));
+ if(--spawn<=0){spawn=Math.max(14,45-lvl*3);items.push({x:20+Math.random()*(W-40),y:-20,bug:Math.random()<Math.min(.55,.3+lvl*.02),v:2+lvl*.35})}
+ x.clearRect(0,0,W,H);
+ x.strokeStyle='rgba(123,223,242,.07)';x.lineWidth=1;
+ for(let i=0;i<W;i+=30){x.beginPath();x.moveTo(i,0);x.lineTo(i,H);x.stroke()}
+ for(let j=0;j<H;j+=30){x.beginPath();x.moveTo(0,j);x.lineTo(W,j);x.stroke()}
+ x.font='30px serif';x.textAlign='center';x.textBaseline='middle';
+ x.fillText('🧑‍💻',px,H-40);
+ for(const it of items){it.y+=it.v;x.fillText(it.bug?'🐞':'☕',it.x,it.y);
+  if(it.y>H-62&&it.y<H-18&&Math.abs(it.x-px)<28){it.hit=1;
+   if(it.bug){lives--;$('l').textContent=lives}else{score++;$('s').textContent=score}}
+  else if(it.y>H+20)it.hit=1}
+ items=items.filter(i=>!i.hit);
+ if(lives<=0)return end();
+ requestAnimationFrame(loop)}
+</script>
+</body>
+</html>
