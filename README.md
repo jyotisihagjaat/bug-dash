@@ -2,7 +2,7 @@
 
 A fast-paced browser game where you play a developer trying to ship clean code. Catch the coffee, dodge the bugs, and see how long you can survive.
 
-### 🎮 [Play it now](file:///C:/Users/A%20To%20Z/Downloads/Bug%20Dash.html)
+### 🎮 [Play it now](https://jyotisihagjaat@gmail.com.github.io/bug-dash)
 
 
 ## How to play
