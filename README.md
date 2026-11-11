@@ -4,8 +4,6 @@ A fast-paced browser game where you play a developer trying to ship clean code. 
 
 ### 🎮 [Play it now](file:///C:/Users/A%20To%20Z/Downloads/Bug%20Dash.html)
 
-![Bug Dash gameplay](<img width="396" height="447" alt="image" src="https://github.com/user-attachments/assets/f4f0fcc2-a6b2-4e8e-9929-339db0b468df" />
-)
 
 ## How to play
 
